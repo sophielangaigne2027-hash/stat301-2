@@ -1,0 +1,12 @@
+Model,Recipe,RMSE,Std Error
+Boosted Tree,r2,44.2874,8.1708
+Boosted Tree,r1,44.4602,8.1628
+Random Forest,r2,54.379,8.0673
+Random Forest,r1,54.4378,8.0781
+KNN,r1,62.0367,7.1061
+KNN,r2,64.1014,7.8925
+Elastic Net,r2,65.876,7.7729
+Null,baseline,69.7655,7.5594
+Elastic Net,r1,69.7655,7.5594
+Baseline (LM),baseline,76.468,5.2096
+Linear Regression,r1,76.8494,6.581

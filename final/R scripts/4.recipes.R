@@ -6,7 +6,7 @@ library(doParallel)
 
 tidymodels_prefer()
 
-load(here("data/energy_train.rda"))
+load(here("final/data/energy_train.rda"))
 
 # ============================================================
 # RECIPE 1: KITCHEN SINK
@@ -92,9 +92,9 @@ recipe1_tree %>% prep() %>% bake(new_data = NULL) %>% glimpse()
 recipe2_main %>% prep() %>% bake(new_data = NULL) %>% glimpse()
 recipe2_tree %>% prep() %>% bake(new_data = NULL) %>% glimpse()
 
-save(recipe1_main, file = here("recipes/recipe1_main.rda"))
-save(recipe1_tree, file = here("recipes/recipe1_tree.rda"))
-save(recipe2_main, file = here("recipes/recipe2_main.rda"))
-save(recipe2_tree, file = here("recipes/recipe2_tree.rda"))
+save(recipe1_main, file = here("final/recipes/recipe1_main.rda"))
+save(recipe1_tree, file = here("final/recipes/recipe1_tree.rda"))
+save(recipe2_main, file = here("final/recipes/recipe2_main.rda"))
+save(recipe2_tree, file = here("final/recipes/recipe2_tree.rda"))
 
 

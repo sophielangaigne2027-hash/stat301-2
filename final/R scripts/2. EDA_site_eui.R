@@ -6,7 +6,7 @@ library(here)
 library(corrplot)
 library(ggplot2)
 
-load(here("data/energy_train.rda"))
+load(here("final/data/energy_train.rda"))
 
 # Initial EDA before data cleaning
 library(tidyverse)
@@ -35,6 +35,7 @@ data_summary <- tibble(
   )
 )
 # Save as CSV
+dir.create(here("tables"), showWarnings = FALSE)
 write_csv(data_summary, here("tables/data_summary.csv"))
 
 #Missingness
@@ -61,7 +62,7 @@ p1 <- ggplot(energy_train, aes(x = site_eui)) +
   geom_histogram(bins = 50, fill = "steelblue") +
   labs(title = "Distribution of Site EUI", x = "Site EUI (kBtu/ft²)", y = "Count")
 
-ggsave(here("plots/site_eui_histogram.png"), plot = p1, width = 8, height = 5)
+ggsave(here("final/plots/site_eui_histogram.png"), plot = p1, width = 8, height = 5)
 
 #Log Scale
 p2 <- ggplot(energy_train, aes(x = site_eui)) +
@@ -69,7 +70,7 @@ p2 <- ggplot(energy_train, aes(x = site_eui)) +
   scale_x_log10() +
   labs(title = "Distribution of Site EUI (log scale)", x = "Site EUI (kBtu/ft²)", y = "Count")
 
-ggsave(here("plots/site_eui_histogram_log.png"), plot = p2, width = 8, height = 5)
+ggsave(here("final/plots/site_eui_histogram_log.png"), plot = p2, width = 8, height = 5)
 
 
 # SITE EUI BY BOROUGH 
@@ -77,7 +78,7 @@ p5 <- ggplot(energy_train, aes(x = Borough, y = site_eui)) +
   geom_boxplot(fill = "steelblue", outlier.alpha = 0.2) +
   labs(title = "Site EUI by Borough", y = "Site EUI (kBtu/ft²)")
 
-ggsave(here("results/site_eui_by_borough.png"), plot = p5, width = 8, height = 5)
+ggsave(here("final/plots/site_eui_by_borough.png"), plot = p5, width = 8, height = 5)
 
 # TOP CORRELATED VARIABLES PLOTTED AGAINST SITE EUI 
 numeric_cors <- energy_train %>%
@@ -103,6 +104,6 @@ p4 <- energy_train %>%
   labs(title = "Top 6 Predictors vs Site EUI (with loess curve)",
        x = NULL, y = "Site EUI")
 
-ggsave(here("plots/site_eui_predictors.png"), plot = p4, 
+ggsave(here("final/plots/site_eui_predictors.png"), plot = p4, 
        width = 14, height = 10, dpi = 300)
 

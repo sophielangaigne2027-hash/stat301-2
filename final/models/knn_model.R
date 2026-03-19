@@ -6,10 +6,10 @@ library(doParallel)
 tidymodels_prefer()
 
 # Load data and recipes
-load(here("data/energy_train.rda"))
-load(here("data/energy_folds.rda"))
-load(here("recipes/recipe1_main.rda"))
-load(here("recipes/recipe2_main.rda"))
+load(here("final/data/energy_train.rda"))
+load(here("final/data/energy_folds.rda"))
+load(here("final/recipes/recipe1_main.rda"))
+load(here("final/recipes/recipe2_main.rda"))
 
 # KNN MODEL SPEC
 knn_model <- nearest_neighbor(
@@ -61,8 +61,8 @@ stopCluster(cl)
 registerDoSEQ()
 
 # RESULTS
-save(knn_tune_r1, file = here("results/knn_tune_r1.rda"))
-save(knn_tune_r2, file = here("results/knn_tune_r2.rda"))
+save(knn_tune_r1, file = here("final/results/knn_tune_r1.rda"))
+save(knn_tune_r2, file = here("final/results/knn_tune_r2.rda"))
 
 
 

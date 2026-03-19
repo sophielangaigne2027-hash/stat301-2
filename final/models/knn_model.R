@@ -27,11 +27,9 @@ knn_workflow_r2 <- workflow() %>%
   add_model(knn_model) %>%
   add_recipe(recipe2_main)
 
-# SAME TUNING GRID FOR BOTH (fair comparison)
 
 knn_grid_r1 <- tibble(neighbors = seq(8, 35, by = 1))
 
-# Recipe 2 — still dropping fast, need to go much higher  
 knn_grid_r2 <- tibble(neighbors = seq(8, 60, by = 1))
 
 # PARALLEL PROCESSING

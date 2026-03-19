@@ -1,99 +1,242 @@
+---
+editor: 
+  markdown: 
+    wrap: 72
+---
 
-
+Final Project Executive Summary
 
 # Introduction
-New York City is one of the largest energy consumers in the United States, with its building stock accounting for approximately 70% of the city's total greenhouse gas emissions. Understanding what drives energy consumption in buildings is critical for informing policy decisions, guiding retrofits, and achieving the city's climate goals under Local Law 97, which mandates significant emissions reductions from large buildings by 2030.
 
-The prediction research question for this project is: Can we predict a building's Site Energy Use Intensity (kBtu/ft²) based on its physical and operational characteristics? This project aims to predict a building's Site Energy Use Intensity (Site EUI, measured in kBtu/ft²), which represents the amount of energy a building consumes per square foot per year. Site EUI is a widely used benchmarking metric because it normalizes energy consumption by building size, allowing fair comparisons across buildings of different scales. A lower Site EUI indicates a more energy-efficient building. Since Site EUI is a continuous numeric variable, this is a regression problem.
+New York City is one of the largest energy consumers in the United
+States, with its building stock accounting for approximately 70% of the
+city's total greenhouse gas emissions. Understanding what drives energy
+consumption in buildings is critical for informing policy decisions,
+guiding retrofits, and achieving the city's climate goals under Local
+Law 97, which mandates significant emissions reductions from large
+buildings by 2030.
 
-Accurately predicting Site EUI based on a building's physical and operational characteristics, such as size, age, and occupancy type, is highly valuable for multiple stakeholders. Building owners and property managers can use such a model to identify cost-saving opportunities and prioritize energy retrofits. Policymakers can use findings about which features are most predictive of high energy use to guide future building codes and enforcement strategies. More broadly, this project contributes to ongoing research on urban energy consumption and climate accountability.
- 
+The prediction research question for this project is: Can we predict a
+building's Site Energy Use Intensity (kBtu/ft²) based on its physical
+and operational characteristics? This project aims to predict a
+building's Site Energy Use Intensity (Site EUI, measured in kBtu/ft²),
+which represents the amount of energy a building consumes per square
+foot per year. Site EUI is a widely used benchmarking metric because it
+normalizes energy consumption by building size, allowing fair
+comparisons across buildings of different scales. A lower Site EUI
+indicates a more energy-efficient building. Since Site EUI is a
+continuous numeric variable, this is a regression problem.
+
+Accurately predicting Site EUI based on a building's physical and
+operational characteristics, such as size, age, and occupancy type, is
+highly valuable for multiple stakeholders. Building owners and property
+managers can use such a model to identify cost-saving opportunities and
+prioritize energy retrofits. Policymakers can use findings about which
+features are most predictive of high energy use to guide future building
+codes and enforcement strategies. More broadly, this project contributes
+to ongoing research on urban energy consumption and climate
+accountability.
 
 # Data Source
-The data used in this project comes from NYC Open Data's Energy and Water Data Disclosure for Local Law 84 (2021), which contains energy benchmarking reports submitted annually by owners of large NYC buildings. The dataset contains over 25,000 observations and includes variables describing building characteristics, location, occupancy, and energy consumption metrics.
 
-NYC Open Data. (2021). Energy and Water Data Disclosure for Local Law 84 2021 (Data for Calendar Year 2020). City of New York. https://data.cityofnewyork.us/Environment/Energy-and-Water-Data-Disclosure-for-Local-Law-84-/usc3-8zwd/about_data
+The data used in this project comes from NYC Open Data's Energy and
+Water Data Disclosure for Local Law 84 (2021), which contains energy
+benchmarking reports submitted annually by owners of large NYC
+buildings. The dataset contains over 25,000 observations and includes
+variables describing building characteristics, location, occupancy, and
+energy consumption metrics.
+
+NYC Open Data. (2021). Energy and Water Data Disclosure for Local Law 84
+2021 (Data for Calendar Year 2020). City of New York.
+https://data.cityofnewyork.us/Environment/Energy-and-Water-Data-Disclosure-for-Local-Law-84-/usc3-8zwd/about_data
 
 # Data Overview
-Data Quality & Missingness
-The raw dataset contains 28,067 observations and 250 variables, of which 19 are numeric and 231 are categorical. A missingness inspection revealed that several variables have notable proportions of missing values. For numeric variables, missing values will be imputed using the median to avoid sensitivity to outliers. For categorical variables, rows with missing values will be removed. Given the large number of observations, this approach is unlikely to meaningfully skew model estimates.
 
-Target Variable: Site EUI
-The response variable, Site EUI (kBtu/ft²), was heavily right-skewed in its raw form, with a small number of buildings reporting extremely high energy use intensity — likely large or industrial facilities with outsized consumption. To address this, a log transformation (log1p) was applied, resulting in a more symmetric, approximately normal distribution centered around 90 kBtu/ft². This transformation stabilizes variance and improves model performance for algorithms sensitive to distributional assumptions.
-Outliers on the higher end of the distribution are expected given the nature of the data and will be accounted for during feature engineering and model building.
+Data Quality & Missingness The raw dataset contains 28,067 observations
+and 250 variables, of which 19 are numeric and 231 are categorical. A
+missingness inspection revealed that several variables have notable
+proportions of missing values. For numeric variables, missing values
+will be imputed using the median to avoid sensitivity to outliers. For
+categorical variables, rows with missing values will be removed. Given
+the large number of observations, this approach is unlikely to
+meaningfully skew model estimates.
 
-
-
+Target Variable: Site EUI The response variable, Site EUI (kBtu/ft²),
+was heavily right-skewed in its raw form, with a small number of
+buildings reporting extremely high energy use intensity — likely large
+or industrial facilities with outsized consumption. To address this, a
+log transformation (log1p) was applied, resulting in a more symmetric,
+approximately normal distribution centered around 90 kBtu/ft². This
+transformation stabilizes variance and improves model performance for
+algorithms sensitive to distributional assumptions. Outliers on the
+higher end of the distribution are expected given the nature of the data
+and will be accounted for during feature engineering and model building.
 
 # Methods
-Data Splitting
-The dataset was split into training and testing sets using an 80/20 split, with 80% of observations allocated to training and 20% reserved for final model evaluation. Stratified sampling on the target variable site_eui was used to ensure both sets had a similar distribution of energy use intensity values. This is a regression prediction problem, as the goal is to predict a continuous numeric outcome.
 
-Resampling
-To evaluate model performance during tuning and selection, 5-fold cross-validation with 4 repeats was applied to the training set, again stratified by site_eui. This resulted in 20 total resamples, providing a robust and stable estimate of out-of-sample performance while reducing the risk of overfitting to any single fold.
+Data Splitting The dataset was split into training and testing sets
+using an 80/20 split, with 80% of observations allocated to training and
+20% reserved for final model evaluation. Stratified sampling on the
+target variable site_eui was used to ensure both sets had a similar
+distribution of energy use intensity values. This is a regression
+prediction problem, as the goal is to predict a continuous numeric
+outcome.
+
+Resampling To evaluate model performance during tuning and selection,
+5-fold cross-validation with 4 repeats was applied to the training set,
+again stratified by site_eui. This resulted in 20 total resamples,
+providing a robust and stable estimate of out-of-sample performance
+while reducing the risk of overfitting to any single fold.
+
+Recipes Recipe 1 Main included the full set of predictors after
+cleaning, with standard preprocessing steps including imputation of
+missing values, dummy encoding of categorical variables, and
+normalization of numeric predictors where required.
+
+Recipe 2 Main was a variation designed to explore the predictive
+importance of certain variable groups — notably energy use variables
+(electricity, natural gas, steam, etc.) and property-type floor area
+variables. This recipe has a higher chance of being successful due to
+it's specific tailoring.
+
+These things hold true for Recipe 1 Tree and Recipe 2 Tree.
 
 # Model Types
+
 7 model types were fit and compared:
 
-Null Model — a baseline that predicts the mean of site_eui for all observations, serving as a performance floor
-Baseline Model — a simple reference model used to contextualize the performance of more complex models
-Linear Regression (LM) — a parametric model that assumes a linear relationship between predictors and the outcome
-Elastic Net (EN) — a regularized regression model combining L1 and L2 penalties, useful for handling correlated predictors and performing variable selection
-K-Nearest Neighbors (KNN) — a non-parametric model that predicts based on the average outcome of the most similar observations in the training set
-Random Forest (RF) — an ensemble of decision trees using bagging, which captures non-linear relationships and interaction effects
-Boosted Tree (BT/XGBoost) — a sequential ensemble method that iteratively fits trees to residuals, offering strong predictive performance on structured tabular data. 
+Null Model — a baseline that predicts the mean of site_eui for all
+observations, serving as a performance floor Baseline Model — a simple
+reference model used to contextualize the performance of more complex
+models Linear Regression (LM) — a parametric model that assumes a linear
+relationship between predictors and the outcome Elastic Net (EN) — a
+regularized regression model combining L1 and L2 penalties, useful for
+handling correlated predictors and performing variable selection
+K-Nearest Neighbors (KNN) — a non-parametric model that predicts based
+on the average outcome of the most similar observations in the training
+set Random Forest (RF) — an ensemble of decision trees using bagging,
+which captures non-linear relationships and interaction effects Boosted
+Tree (BT/XGBoost) — a sequential ensemble method that iteratively fits
+trees to residuals, offering strong predictive performance on structured
+tabular data.
 
 # Tuning Parameters
-The boosted tree model required hyperparameter tuning. The following parameters were tuned using a regular grid search:
 
-trees — number of boosting iterations (searched over 200–1000)
-tree_depth — maximum depth of each tree (searched over 3–8)
-learn_rate — step size shrinkage to prevent overfitting (searched on log scale over 10⁻³–10⁻¹)
-min_n — minimum number of observations required to split a node (searched over 5–30)
+In order to determine tuning parameters for each model I tuned broadly
+without any set parameters analyzed the autoplots for the results. I
+continued to change the parameters and narrow down what would be the
+best parameters and the parameters showed in the models are the most
+efficient best parameters. For some models I had to analyze 2 or 3
+different autoplots however the ones uploaded are the best and final
+autoplots.
 
-A grid of 3 levels per parameter was used, resulting in 81 candidate combinations evaluated across all resamples.
-Recipes
-A standard preprocessing recipe was applied to all models, including imputation of missing values, dummy encoding of nominal predictors, and normalization of all numeric predictors to have mean zero and standard deviation one. Normalization was applied primarily to benefit the linear regression model, as tree-based methods are scale-invariant.
+KNN — tuned neighbors. Recipe 1 optimal at k ≈ 13–15, Recipe 2 at k ≈
+30–40, both showing classic U-shape. Elastic Net — tuned penalty and
+mixture. Recipe 1 preferred heavy regularization (log penalty ≈ 1.75),
+Recipe 2 preferred low penalty with mixture ≈ 0.2–0.3, suggesting the
+two feature sets respond very differently to regularization. Boosted
+Tree — tuned tree_depth and min_n. Both recipes agreed on depth 8–9 and
+min_n ≈ 23–24 (RMSE ≈ 44–45). Random Forest — tuned mtry and min_n, with
+trees fixed at 150. Both recipes identified mtry = 8 and min_n ≈ 4–5 as
+optimal RMSE ≈ 54–55.
 
 # Model Selection Metric
-To compare models and select a final one, Root Mean Squared Error (RMSE) was used as the primary evaluation metric. RMSE measures the average magnitude of prediction errors in the same units as the outcome variable site_eui, making it straightforward to interpret. Lower RMSE means that the model's predictions are closer to the actual energy use values on average. RMSE was preferred over Mean Absolute Error (MAE) because it squares the errors before averaging, which means larger mistakes are penalized more heavily. This felt appropriate for this problem since significantly over- or under-predicting a building's energy use would be more problematic than small, consistent errors. The model and hyperparameter combination that achieved the lowest average RMSE across all cross-validation resamples was ultimately chosen as the final model.
 
+To compare models and select a final one, Root Mean Squared Error (RMSE)
+was used as the primary evaluation metric. RMSE measures the average
+magnitude of prediction errors in the same units as the outcome variable
+site_eui, making it straightforward to interpret. Lower RMSE means that
+the model's predictions are closer to the actual energy use values on
+average. RMSE was preferred over Mean Absolute Error (MAE) because it
+squares the errors before averaging, which means larger mistakes are
+penalized more heavily. This felt appropriate for this problem since
+significantly over- or under-predicting a building's energy would be a
+problem.
 
-Comment on Generative AI Use
-I used Generative AI to help organize my ideas and to explain my reasoning for my metrics as well as for tuning parameters. I used AI to help me analyze the autoplots for each model so that the parameters used for each model were as accurate as possible. In addition, I used it for the explanation for each model. 
+# Final Model
 
-Appendix: Tuning Parameter Analysis
+The best performing model overall is Boosted Tree (r2) with the lowest
+RMSE of 44.29. So from fitting this model, the winning Boosted Tree
+model achieves an RMSE of 34.8, R-squared of 0.675, and MAE of 9.77 on
+the test data — notably, the RMSE of 34.8 is a significant improvement
+over the tuning RMSE of 44.29, suggesting the model generalizes well and
+wasn't overfit. The null baseline had an RMSE of \~69.77, so the Boosted
+Tree cuts error roughly in half, which is a meaningful.The R-squared of
+0.675 means the model explains about 67.5% of variance in the outcome,
+which is reasonably strong.
+
+The bulk of predictions cluster tightly along the red dashed
+perfect-prediction line at lower values (0–300), indicating the model
+performs well for typical observations.However due to outliers, the
+model struggles at the extremes of the distribution.
+
+Boosted Trees naturally handle nonlinearity and complex interactions
+between features without requiring manual feature engineering, which
+likely explains why it outperformed other models.
+
+# Comment on Generative AI Use
+
+I used Generative AI to help organize my ideas and to explain my
+reasoning for my metrics as well as for tuning parameters. I used AI to
+help me analyze the autoplots for each model so that the parameters used
+for each model were as accurate as possible. In addition, I used it for
+the explanation for each model.
+
+# Appendix: Tuning Parameter Analysis
+
 Tuning Parameters Analysis of Autoplots
 
-EN plots
-autoen1 shows RMSE improving (dropping from ~76 to ~70) as regularization increases, then flattening out, with the lasso proportion having little effect. autoen2 shows the opposite pattern, starting at a better RMSE of ~66 with low regularization and worsening as regularization increases, making the 2nd recipe the overall better-performing recipe out of the two.
+EN plots autoen1 shows RMSE improving (dropping from \~76 to \~70) as
+regularization increases, then flattening out, with the lasso proportion
+having little effect. autoen2 shows the opposite pattern, starting at a
+better RMSE of \~66 with low regularization and worsening as
+regularization increases, making the 2nd recipe the overall
+better-performing recipe out of the two.
 
-KNN plots
-autoknn1 shows a clear U-shape with RMSE bottoming out at ~62.1 around k=13–15 neighbors before rising steadily to ~62.6, making that the optimal k. autoknn2 shows a steep decline from ~67 at k=1 that flattens into a broad minimum of ~64.1 around k=30–40, with a much wider range of acceptable k values but an overall worse best RMSE compared to r1.
+KNN plots autoknn1 shows a clear U-shape with RMSE bottoming out at
+\~62.1 around k=13–15 neighbors before rising steadily to \~62.6, making
+that the optimal k. autoknn2 shows a steep decline from \~67 at k=1 that
+flattens into a broad minimum of \~64.1 around k=30–40, with a much
+wider range of acceptable k values but an overall worse best RMSE
+compared to r1.
 
+Appendix EDA: Distribution of Site EUI Plots(site_eui_histogram_log &
+site_eui_histogram) Transforming to log scale reveals the underlying
+shape much more clearly: the distribution becomes approximately normal,
+centered around 80–120 kBtu/ft², with a gentle taper on both sides.
+Better for linear models.
 
+Top Predictors Electricity Use (Grid Purchase) shows a weak positive
+relationship with a flattening loess curve, huge variance, suggesting
+electricity explains some but not all of the EUI story.
 
+Natural Gas Use has a striking inverted-U loess curve, peaking around
+1.5×10⁹ kBtu before declining. Buildings with extreme gas use may be
+large industrial or specialty properties where floor area dominates the
+denominator of EUI. This variable may need to be removed.
 
-Appendix EDA:
-Distribution of Site EUI
-Plots(site_eui_histogram_log & site_eui_histogram)
-Transforming to log scale reveals the underlying shape much more clearly: the distribution becomes approximately normal, centered around 80–120 kBtu/ft², with a gentle taper on both sides. Better for linear models. 
+Hospital Floor Area and Laboratory Floor Area both show the bulk of data
+jammed at zero with a few extreme outliers.
 
-Top Predictors
-Electricity Use (Grid Purchase) shows a weak positive relationship with a flattening loess curve, huge variance, suggesting electricity explains some but not all of the EUI story.
+Occupancy shows discrete clustering suggesting it may be ordinal or
+bucketed rather than continuous. The flat loess confirms weak direct
+linear correlation with EUI.
 
-Natural Gas Use has a striking inverted-U loess curve, peaking around 1.5×10⁹ kBtu before declining. Buildings with extreme gas use may be large industrial or specialty properties where floor area dominates the denominator of EUI. This variable may need to be removed. 
+Supermarket/Grocery Floor Area mirrors the hospital/lab pattern highly
+sparse with most buildings at zero.
 
-Hospital Floor Area and Laboratory Floor Area both show the bulk of data jammed at zero with a few extreme outliers.
+Overall, the extreme outlier points visible across all panels suggest
+that outlier treatment and log transformation of predictors will be
+critical before fitting any model.
 
-Occupancy shows discrete clustering suggesting it may be ordinal or bucketed rather than continuous. The flat loess confirms weak direct linear correlation with EUI.
+Site Eui by Borough The median EUI is remarkably consistent across all
+five boroughs, all sitting around 50–150 kBtu/ft². However, Manhattan
+stands out with the single most extreme outlier (\~6,800 kBtu/ft²),
+which likely corresponds to a hospital, data center, or lab. Queens also
+shows a notable high outlier (\~1,200). Staten Island has fewer extreme
+values and a higher median. Borough alone is probably not a strong
+standalone predictor.
 
-Supermarket/Grocery Floor Area mirrors the hospital/lab pattern highly sparse with most buildings at zero.
-
-Overall, the extreme outlier points visible across all  panels suggest that outlier treatment and log transformation of predictors will be critical before fitting any model.
-
-Site Eui by Borough
-The median EUI is remarkably consistent across all five boroughs, all sitting around 50–150 kBtu/ft². However, Manhattan stands out with the single most extreme outlier (~6,800 kBtu/ft²), which likely corresponds to a hospital, data center, or lab. Queens also shows a notable high outlier (~1,200). Staten Island has fewer extreme values and a higher median. Borough alone is probably not a strong standalone predictor. 
-
-Median Site EUI by Property
-The spread across property types has a large range, confirming that property type should be a primary feature in any predictive model.
+Median Site EUI by Property The spread across property types has a large
+range, confirming that property type should be a primary feature in any
+predictive model.

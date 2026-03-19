@@ -28,17 +28,17 @@ en_workflow_r2 <- workflow() %>%
   add_model(en_model) %>%
   add_recipe(recipe2_main)
 
-# TUNING GRID — wider penalty range + bigger size for better coverage
+# TUNING GRID 
 en_grid_r1 <- grid_latin_hypercube(
-  penalty(range = c(1, 3)),   # focus on where RMSE plateaus/minimizes
-  mixture(range = c(0.4, 1)), # lasso-leaning region performs best
+  penalty(range = c(1, 3)),  
+  mixture(range = c(0.4, 1)), 
   size = 50
 )
 
-# Recipe 2 — cut off the high penalty region that hurts performance
+# Recipe 2 
 en_grid_r2 <- grid_latin_hypercube(
-  penalty(range = c(0, 2)),     # shift left boundary up, optimum is ~1–1.5
-  mixture(range = c(0.1, 0.6)), # this is well-behaved, keep it
+  penalty(range = c(0, 2)),     
+  mixture(range = c(0.1, 0.6)),
   size = 50
 )
 

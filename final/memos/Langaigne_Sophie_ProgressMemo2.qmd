@@ -1,5 +1,5 @@
 ---
-title: "Final Project Progress Memo 1 Sophie Langaigne"
+title: "Final Project Progress Memo 2 Sophie Langaigne"
 subtitle: "Data Science 2 with R (STAT 301-2)"
 author: "Sophie Langaigne"
 pagetitle: "Final Project Progress Memo 1"
@@ -235,4 +235,4 @@ Misc
 Progress Memo 2: Additions:
 
 Wrangled Data
-Models Being Used: Null, Baseline, Lm, Knn, Bayes, Bt, En, Rf 
+Models Being Used: Null, Baseline, Lm, Knn, Bt, En, Rf 

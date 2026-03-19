@@ -1,0 +1,14 @@
+---
+title: "Executive Summary"
+format: html
+---
+
+This project predicts Site Energy Use Intensity (Site EUI, kBtu/ft²) for NYC buildings using data from \~28,000 observations from NYC's Local Law 84 energy benchmarking dataset. A log transformation was applied.
+
+Seven models were trained and compared using RMSE as the primary metric, evaluated via 5-fold cross-validation with 4 repeats. The Boosted Tree (XGBoost) with Recipe 2 won with a tuning RMSE of 44.29, cutting the null baseline's RMSE of 69.77 roughly in half. On the final test set, it achieved an RMSE of 34.8, R² of 0.675, and MAE of 9.77. Boosted Trees succeeded largely because it handled nonlinearity and feature interactions.
+
+The predicted vs. actual plot shows strong performance for typical buildings but some struggle with extreme outliers, which was consistent with the EDA.
+
+The data used in this project comes from NYC Open Data's Energy and Water Data Disclosure for Local Law 84 (2021), which contains energy benchmarking reports submitted annually by owners of large NYC buildings. The dataset contains over 25,000 observations and includes variables describing building characteristics, location, occupancy, and energy consumption metrics.
+
+NYC Open Data. (2021). Energy and Water Data Disclosure for Local Law 84 2021 (Data for Calendar Year 2020). City of New York. <https://data.cityofnewyork.us/Environment/Energy-and-Water-Data-Disclosure-for-Local-Law-84-/usc3-8zwd/about_data>

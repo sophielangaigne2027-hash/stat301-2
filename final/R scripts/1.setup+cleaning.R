@@ -5,6 +5,13 @@ library(here)
 library(doParallel)
 tidymodels_prefer()
 
+dir.create(here("tables"), showWarnings = FALSE)
+dir.create(here("results"), showWarnings = FALSE)
+dir.create(here("plots"), showWarnings = FALSE)
+dir.create(here("R scripts"), showWarnings = FALSE)
+dir.create(here("recipes"), showWarnings = FALSE)
+dir.create(here("memos"), showWarnings = FALSE)
+dir.create(here("models"), showWarnings = FALSE)
 
 #Loading and Cleaning Data
 set.seed(100)
@@ -115,7 +122,7 @@ energy <- read_csv("data/energy.csv",
   mutate(across(where(is.numeric), ~ replace_na(.x, median(.x, na.rm = TRUE))))
 
 
-save(energy, file = here("data/energy.rda"))
+save(energy, file = here("final/data/energy.rda"))
 
 
 

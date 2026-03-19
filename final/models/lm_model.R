@@ -5,12 +5,12 @@ library(doParallel)
 tidymodels_prefer()
 
 # load data ----
-load(here("data/energy_train.rda"))
-load(here("data/energy_test.rda"))
-load(here("data/energy_folds.rda"))
+load(here("final/data/energy_train.rda"))
+load(here("final/data/energy_test.rda"))
+load(here("final/data/energy_folds.rda"))
 
 # load recipe ----
-load(here("recipes/energy_recipe_lm.rda"))
+load(here("final/recipes/energy_recipe_lm.rda"))
 
 # model specification ----
 lm_spec <- linear_reg() %>%
@@ -33,5 +33,5 @@ lm_results <- fit_resamples(
 
 
 # write out results (fitted/trained workflows) ----
-save(lm_results, file = here("results/lm_results.rda"))
+save(lm_results, file = here("final/results/lm_results.rda"))
 

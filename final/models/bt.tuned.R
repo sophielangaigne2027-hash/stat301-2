@@ -6,10 +6,10 @@ library(xgboost)
 tidymodels_prefer()
 
 # Load data and objects ----
-load(here("data/energy_train.rda"))
-load(here("data/energy_folds.rda"))
-load(here("recipes/recipe1_tree.rda"))
-load(here("recipes/recipe2_tree.rda"))
+load(here("final/data/energy_train.rda"))
+load(here("final/data/energy_folds.rda"))
+load(here("final/recipes/recipe1_tree.rda"))
+load(here("final/recipes/recipe2_tree.rda"))
 
 # Define model — trees fixed, now tuning depth and min_n ----
 bt_spec <- boost_tree(
@@ -64,16 +64,12 @@ stopCluster(cl)
 registerDoSEQ()
 
 # Examine results ----
-autoplot(bt_res1)
-autoplot(bt_res2)
-show_best(bt_res1, metric = "rmse", n = 5)
-show_best(bt_res2, metric = "rmse", n = 5)
 
 # Save autoplots ----
-ggsave(here("results/autoplot_bt_r1.png"), plot = autoplot(bt_res1), width = 10, height = 7, dpi = 300)
-ggsave(here("results/autoplot_bt_r2.png"), plot = autoplot(bt_res2), width = 10, height = 7, dpi = 300)
+ggsave(here("final/results/autoplot_bt_r1.png"), plot = autoplot(bt_res1), width = 10, height = 7, dpi = 300)
+ggsave(here("final/results/autoplot_bt_r2.png"), plot = autoplot(bt_res2), width = 10, height = 7, dpi = 300)
 
 # Save results ----
-save(bt_res1, file = here("results/bt_res1.rda"))
-save(bt_res2, file = here("results/bt_res2.rda"))
+save(bt_res1, file = here("final/results/bt_res1.rda"))
+save(bt_res2, file = here("final/results/bt_res2.rda"))
 

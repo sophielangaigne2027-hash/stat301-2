@@ -8,16 +8,14 @@ library(doParallel)
 tidymodels_prefer()
 
 # Load training data ----
-load(here("data/energy_train.rda"))
-load(here("data/energy_test.rda"))
-load(here("data/energy_folds.rda"))
-load(here("data/keep_pred.rda"))
-load(here("data/keep_grid.rda"))
+load(here("final/data/energy_train.rda"))
+load(here("final/data/energy_test.rda"))
+load(here("final/data/energy_folds.rda"))
 
 # Load recipes ----
-load(here("recipes/energy_recipe_lm.rda"))
-load(here("recipes/energy_recipe_tree.rda"))
-load(here("recipes/energy_recipe_baseline.rda"))
+load(here("final/recipes/energy_recipe_lm.rda"))
+load(here("final/recipes/energy_recipe_tree.rda"))
+load(here("final/recipes/energy_recipe_baseline.rda"))
 
 # ============================================================
 # NULL MODEL
@@ -39,7 +37,11 @@ null_results <- fit_resamples(
   control = control_resamples(save_workflow = TRUE)
 )
 
-collect_metrics(null_results)
+null_metrics <- collect_metrics(null_results) %>%
+  filter(.metric == "rmse") %>%
+  mutate(model = "Null", recipe = "baseline")
+
+save(null_metrics, file = here("final/results/null_metrics.rda"))
 
 # ============================================================
 # BASELINE MODEL — Linear Regression
@@ -61,5 +63,9 @@ lm_baseline_results <- fit_resamples(
   control = control_resamples(save_workflow = TRUE)
 )
 
-collect_metrics(lm_baseline_results)
+baseline_metrics <- collect_metrics(lm_baseline_results) %>%
+  filter(.metric == "rmse") %>%
+  mutate(model = "Baseline (LM)", recipe = "baseline")
+
+save(baseline_metrics, file = here("final/results/baseline_metrics.rda"))
 

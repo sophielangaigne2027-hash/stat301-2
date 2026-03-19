@@ -1,0 +1,124 @@
+---
+title: "Final Project Progress Memo 1 Sophie Langaigne"
+subtitle: "Data Science 2 with R (STAT 301-2)"
+author: "Sophie Langaigne"
+pagetitle: "Final Project Progress Memo 1"
+date: today
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 4
+    toc-location: left
+    embed-resources: true
+    code-fold: false
+    link-external-newwindow: true
+execute:
+  echo: false
+  warning: false
+  message: false
+
+from: markdown+emoji
+reference-location: margin
+citation-location: margin   
+---
+
+::: {.callout-tip icon="false"}
+## Github Repo Link
+[Sophie's Final Project Link](https://github.com/sophielangaigne2027-hash/finalstat302-2.git)
+:::
+Prediction problem
+New York City is one of the largest energy consumers in the United States, with its building stock accounting for approximately 70% of the city's total greenhouse gas emissions. Understanding what drives energy consumption in buildings is critical for informing policy decisions, guiding retrofits, and achieving the city's climate goals under Local Law 97, which mandates significant emissions reductions from large buildings by 2030.
+
+The prediction research question for this project is: Can we predict a building's Site Energy Use Intensity (kBtu/ft²) based on its physical and operational characteristics? This project aims to predict a building's Site Energy Use Intensity (kBtu/ft²), which represents the amount of energy a building consumes per square foot per year. This is a regression problem since Site EUI is continuous numeric variable representing the amount of energy consumed per square foot of building area per yea Site EUI is a widely used benchmarking metric because it normalizes energy consumption by building size, allowing fair comparisons across buildings of different scales. A lower Site EUI indicates a more energy-efficient building.  I will use 6 models and 2 recipes to best predict this variable and 13 workflows will help with these predictions. I will then pick the best model and use it to predict Site EUI. Model performance will be assessed using Root Mean Squared Error (RMSE) as the primary metric, as it is interpretable on the same scale as the outcome variable (kBtu/ft²) and penalizes large prediction errors more heavily than alternatives like MAE. A lower RMSE indicates better predictive performance.
+
+The data used in this project comes from NYC Open Data's Energy and Water Data Disclosure for Local Law 84 (2021), which contains energy benchmarking reports submitted annually by owners of large NYC buildings. The dataset contains over 25,000 observations and includes variables describing building characteristics, location, occupancy, and energy consumption metrics.
+
+Being able to accurately predict Site EUI based on a building’s physical and technological characteristics using variables like size, age, occupancy can be incredibly helpful when trying to estimate cost or save money within a business. Building owners and property managers could use such a model to pick the most affordable options within a city. In addition, identifying which features are most predictive of high energy use can guide future building code policy. This project’s results can be used for further research for energy consumption. 
+
+
+
+Data source
+Identify and describe your data source or sources -- citations would be appropriate. Citations must include links to the data source(s).
+
+Citations:
+https://data.cityofnewyork.us/Environment/Energy-and-Water-Data-Disclosure-for-Local-Law-84-/usc3-8zwd/about_data
+
+
+NYC Open Data. (2021). Energy and Water Data Disclosure for Local Law 84 2021 (Data for Calendar Year 2020). City of New York. https://data.cityofnewyork.us/Environment/Energy-and-Water-Data-Disclosure-for-Local-Law-84-/usc3-8zwd/about_data
+
+Data quality check:
+```{r}
+#| include: false
+library(tidyverse)
+library(tidymodels)
+library(here)
+
+# handle common conflicts
+tidymodels_prefer()
+set.seed(100)
+energy <- read_csv("data/energy.csv")
+
+skimr::skim_without_charts(energy)
+
+observations <- nrow(energy)
+variables <- ncol(energy)
+
+energy %>%
+  summarise(
+    numeric = sum(sapply(energy, is.numeric)),
+    categorical = sum(sapply(energy, is.character)),
+    factor = sum(sapply(energy, is.factor))
+  )
+```
+
+```{r}
+#| echo: false
+#| results: hide
+energy |>
+  summarise(across(everything(), ~ mean(is.na(.)))) |>
+  pivot_longer(everything(), names_to = "variable", values_to = "pct_missing") |>
+  filter(pct_missing > 0) |>
+  arrange(desc(pct_missing)) |>
+  ggplot(aes(x = reorder(variable, pct_missing), y = pct_missing)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Missingness by Variable",
+       x = NULL,
+       y = "% Missing") +
+  theme_minimal()
+```
+
+
+How many variables and observations do you have? 
+There are 28067 observations before tidying the data and 250 variables and there are 19 numeric and 231 categorical variables. There are some issues in missingness as shown in the graph above however when tidying the data I will deal with the missingness by replacing numeric values with the median and deleting rows for categorical variables. There are many observations so reducing the number observations will not overly skew the prediction estimate. 
+
+Target variable analysis
+A univariate analysis of the target variable. Identify and discuss potential issues (symmetry/unbalanced/skewness & missingness) and discuss potential solutions such as transformations. 
+```{r}
+
+energy <- energy |>
+  rename(site_eui = "Site EUI (kBtu/ft²)") |>
+  mutate(site_eui = as.numeric(site_eui)) |>
+  filter(!is.na(site_eui)) |>
+  mutate(site_eui = log1p(site_eui))
+
+ ggplot(energy, aes(x = site_eui)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 50,
+                 fill = "coral", colour = "white") +
+  geom_density(colour = "darkred", linewidth = 1) +
+  labs(title = "Log Transformed Site EUI", 
+       x = "Site EUI", 
+       y = "Density") +
+  theme_minimal()
+```
+Distribution & Skewness
+Site EUI  was heavily right-skewed, with a small number of buildings reporting extremely high energy use intensity. A log transformation (log1p) was applied, more symmetric distribution centred around about 90 kBtu/ft². 
+
+Outliers
+Since this variable's distribution was right skewed the outliers are on the higher end meaning there are probably large buildings that are using higher amount of energy. This will be considered when the models are made to predict Site EUI. 
+
+
+Misc

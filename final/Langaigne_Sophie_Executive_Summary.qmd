@@ -1,0 +1,56 @@
+Introduction
+New York City is one of the largest energy consumers in the United States, with its building stock accounting for approximately 70% of the city's total greenhouse gas emissions. Understanding what drives energy consumption in buildings is critical for informing policy decisions, guiding retrofits, and achieving the city's climate goals under Local Law 97, which mandates significant emissions reductions from large buildings by 2030.
+
+The prediction research question for this project is: Can we predict a building's Site Energy Use Intensity (kBtu/ft²) based on its physical and operational characteristics? This project aims to predict a building's Site Energy Use Intensity (Site EUI, measured in kBtu/ft²), which represents the amount of energy a building consumes per square foot per year. Site EUI is a widely used benchmarking metric because it normalizes energy consumption by building size, allowing fair comparisons across buildings of different scales. A lower Site EUI indicates a more energy-efficient building. Since Site EUI is a continuous numeric variable, this is a regression problem.
+
+Accurately predicting Site EUI based on a building's physical and operational characteristics, such as size, age, and occupancy type, is highly valuable for multiple stakeholders. Building owners and property managers can use such a model to identify cost-saving opportunities and prioritize energy retrofits. Policymakers can use findings about which features are most predictive of high energy use to guide future building codes and enforcement strategies. More broadly, this project contributes to ongoing research on urban energy consumption and climate accountability.
+ 
+
+Data Source
+The data used in this project comes from NYC Open Data's Energy and Water Data Disclosure for Local Law 84 (2021), which contains energy benchmarking reports submitted annually by owners of large NYC buildings. The dataset contains over 25,000 observations and includes variables describing building characteristics, location, occupancy, and energy consumption metrics.
+
+NYC Open Data. (2021). Energy and Water Data Disclosure for Local Law 84 2021 (Data for Calendar Year 2020). City of New York. https://data.cityofnewyork.us/Environment/Energy-and-Water-Data-Disclosure-for-Local-Law-84-/usc3-8zwd/about_data
+
+Data Overview
+Data Quality & Missingness
+The raw dataset contains 28,067 observations and 250 variables, of which 19 are numeric and 231 are categorical. A missingness inspection revealed that several variables have notable proportions of missing values. For numeric variables, missing values will be imputed using the median to avoid sensitivity to outliers. For categorical variables, rows with missing values will be removed. Given the large number of observations, this approach is unlikely to meaningfully skew model estimates.
+
+Target Variable: Site EUI
+The response variable, Site EUI (kBtu/ft²), was heavily right-skewed in its raw form, with a small number of buildings reporting extremely high energy use intensity — likely large or industrial facilities with outsized consumption. To address this, a log transformation (log1p) was applied, resulting in a more symmetric, approximately normal distribution centered around 90 kBtu/ft². This transformation stabilizes variance and improves model performance for algorithms sensitive to distributional assumptions.
+Outliers on the higher end of the distribution are expected given the nature of the data and will be accounted for during feature engineering and model building.
+
+
+
+
+Methods
+Data Splitting
+The dataset was split into training and testing sets using an 80/20 split, with 80% of observations allocated to training and 20% reserved for final model evaluation. Stratified sampling on the target variable site_eui was used to ensure both sets had a similar distribution of energy use intensity values. This is a regression prediction problem, as the goal is to predict a continuous numeric outcome.
+
+Resampling
+To evaluate model performance during tuning and selection, 5-fold cross-validation with 4 repeats was applied to the training set, again stratified by site_eui. This resulted in 20 total resamples, providing a robust and stable estimate of out-of-sample performance while reducing the risk of overfitting to any single fold.
+
+Model Types
+7 model types were fit and compared:
+
+Null Model — a baseline that predicts the mean of site_eui for all observations, serving as a performance floor
+Baseline Model — a simple reference model used to contextualize the performance of more complex models
+Linear Regression (LM) — a parametric model that assumes a linear relationship between predictors and the outcome
+Elastic Net (EN) — a regularized regression model combining L1 and L2 penalties, useful for handling correlated predictors and performing variable selection
+K-Nearest Neighbors (KNN) — a non-parametric model that predicts based on the average outcome of the most similar observations in the training set
+Random Forest (RF) — an ensemble of decision trees using bagging, which captures non-linear relationships and interaction effects
+Boosted Tree (BT/XGBoost) — a sequential ensemble method that iteratively fits trees to residuals, offering strong predictive performance on structured tabular data. 
+
+Tuning Parameters
+The boosted tree model required hyperparameter tuning. The following parameters were tuned using a regular grid search:
+
+trees — number of boosting iterations (searched over 200–1000)
+tree_depth — maximum depth of each tree (searched over 3–8)
+learn_rate — step size shrinkage to prevent overfitting (searched on log scale over 10⁻³–10⁻¹)
+min_n — minimum number of observations required to split a node (searched over 5–30)
+
+A grid of 3 levels per parameter was used, resulting in 81 candidate combinations evaluated across all resamples.
+Recipes
+A standard preprocessing recipe was applied to all models, including imputation of missing values, dummy encoding of nominal predictors, and normalization of all numeric predictors to have mean zero and standard deviation one. Normalization was applied primarily to benefit the linear regression model, as tree-based methods are scale-invariant.
+
+Model Selection Metric
+To compare models and select a final one, Root Mean Squared Error (RMSE) was used as the primary evaluation metric. RMSE measures the average magnitude of prediction errors in the same units as the outcome variable site_eui, making it straightforward to interpret. Lower RMSE means that the model's predictions are closer to the actual energy use values on average. RMSE was preferred over Mean Absolute Error (MAE) because it squares the errors before averaging, which means larger mistakes are penalized more heavily. This felt appropriate for this problem since significantly over- or under-predicting a building's energy use would be more problematic than small, consistent errors. The model and hyperparameter combination that achieved the lowest average RMSE across all cross-validation resamples was ultimately chosen as the final model.

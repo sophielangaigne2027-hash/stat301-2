@@ -154,7 +154,7 @@ RMSE of 44.29. So from fitting this model, the winning Boosted Tree
 model achieves an RMSE of 34.8, R-squared of 0.675, and MAE of 9.77 on
 the test data — notably, the RMSE of 34.8 is a significant improvement
 over the tuning RMSE of 44.29, suggesting the model generalizes well and
-wasn't overfit. The null baseline had an RMSE of \~69.77, so the Boosted
+wasn't overfit. The null baseline had an RMSE of ~69.77, so the Boosted
 Tree cuts error roughly in half, which is a meaningful.The R-squared of
 0.675 means the model explains about 67.5% of variance in the outcome,
 which is reasonably strong.
@@ -174,7 +174,7 @@ I used Generative AI to help organize my ideas and to explain my
 reasoning for my metrics as well as for tuning parameters. I used AI to
 help me analyze the autoplots for each model so that the parameters used
 for each model were as accurate as possible. In addition, I used it for
-the explanation for each model.
+the explanation for each model and the EDA.
 
 # Appendix: Tuning Parameter Analysis
 
@@ -232,5 +232,5 @@ values and a higher median. Borough alone is probably not a strong
 standalone predictor.
 
 Median Site EUI by Property The spread across property types has a large
-range, confirming that property type should be a primary feature in any
+range so property type should be a primary feature in any
 predictive model.
